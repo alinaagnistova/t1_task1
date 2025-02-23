@@ -2,6 +2,8 @@ package ru.alina.t1_task1.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.alina.t1_task1.aspect.annotation.CustomExceptionHandling;
+import ru.alina.t1_task1.aspect.annotation.CustomLogging;
 import ru.alina.t1_task1.dto.TaskDto;
 import ru.alina.t1_task1.entity.Task;
 import ru.alina.t1_task1.exception.TaskNotFoundException;
@@ -16,12 +18,14 @@ import java.util.stream.Collectors;
 public class TaskService {
     private final TaskRepository taskRepository;
 
+    @CustomLogging
     public TaskDto addTask(TaskDto taskDto) {
         Task task = TaskMapper.toTaskEntity(taskDto);
         Task savedTask = taskRepository.save(task);
         return TaskMapper.toTaskDto(savedTask);
     }
 
+    @CustomExceptionHandling
     public TaskDto getTaskById(Long id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         return TaskMapper.toTaskDto(task);
@@ -33,6 +37,7 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
+    @CustomExceptionHandling
     public TaskDto updateTaskById(Long id, TaskDto taskDto) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         boolean isUpdated = false;
@@ -51,6 +56,7 @@ public class TaskService {
         return isUpdated ? TaskMapper.toTaskDto(taskRepository.save(task)) : TaskMapper.toTaskDto(task);
     }
 
+    @CustomExceptionHandling
     public void deleteTaskById(Long id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
         taskRepository.deleteById(id);

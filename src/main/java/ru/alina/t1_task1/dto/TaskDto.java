@@ -1,12 +1,9 @@
 package ru.alina.t1_task1.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Builder
-@Getter
-@Setter
+@Data
 public class TaskDto {
     private Long id;
     private String title;
