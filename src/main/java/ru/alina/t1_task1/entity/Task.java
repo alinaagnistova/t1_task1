@@ -3,16 +3,16 @@ package ru.alina.t1_task1.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Table;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "task")
 public class Task {
     @Id
     @GeneratedValue
@@ -20,4 +20,14 @@ public class Task {
     private String title;
     private String description;
     private Long userId;
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", userId=" + userId +
+                '}';
+    }
 }

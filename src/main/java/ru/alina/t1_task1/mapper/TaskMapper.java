@@ -1,10 +1,12 @@
 package ru.alina.t1_task1.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.alina.t1_task1.dto.TaskDto;
 import ru.alina.t1_task1.entity.Task;
 
+@Component
 public class TaskMapper {
-    public static TaskDto toTaskDto(Task task) {
+    public TaskDto toTaskDto(Task task) {
         return TaskDto.builder()
                 .id(task.getId())
                 .title(task.getTitle())
@@ -12,7 +14,7 @@ public class TaskMapper {
                 .userId(task.getUserId())
                 .build();
     }
-    public static Task toTaskEntity(TaskDto taskDto) {
+    public Task toTaskEntity(TaskDto taskDto) {
         return Task.builder()
                 .id(taskDto.getId())
                 .title(taskDto.getTitle())

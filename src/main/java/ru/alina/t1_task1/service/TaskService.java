@@ -17,23 +17,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
     @CustomLogging
     public TaskDto addTask(TaskDto taskDto) {
-        Task task = TaskMapper.toTaskEntity(taskDto);
+        Task task = taskMapper.toTaskEntity(taskDto);
         Task savedTask = taskRepository.save(task);
-        return TaskMapper.toTaskDto(savedTask);
+        return taskMapper.toTaskDto(savedTask);
     }
 
     @CustomExceptionHandling
     public TaskDto getTaskById(Long id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        return TaskMapper.toTaskDto(task);
+        return taskMapper.toTaskDto(task);
     }
 
     public List<TaskDto> getAllTasks() {
         return taskRepository.findAll().stream()
-                .map(TaskMapper::toTaskDto)
+                .map(taskMapper::toTaskDto)
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +54,7 @@ public class TaskService {
             task.setUserId(taskDto.getUserId());
             isUpdated = true;
         }
-        return isUpdated ? TaskMapper.toTaskDto(taskRepository.save(task)) : TaskMapper.toTaskDto(task);
+        return isUpdated ? taskMapper.toTaskDto(taskRepository.save(task)) : taskMapper.toTaskDto(task);
     }
 
     @CustomExceptionHandling

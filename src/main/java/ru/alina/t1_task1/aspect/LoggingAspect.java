@@ -11,13 +11,15 @@ import org.slf4j.LoggerFactory;
 @Aspect
 @Component
 public class LoggingAspect {
+
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
     @Before("execution(* ru.alina.t1_task1.service.TaskService.*(..))")
     public void logMethodExecution(JoinPoint joinPoint) {
         logger.info("Method {} has started execution", joinPoint.getSignature());
     }
-    @AfterThrowing(pointcut= "@annotation(ru.alina.t1_task1.aspect.annotation.CustomExceptionHandling)", throwing = "ex")
+
+    @AfterThrowing(pointcut = "@annotation(ru.alina.t1_task1.aspect.annotation.CustomExceptionHandling)", throwing = "ex")
     public void logMethodThrowing(JoinPoint joinPoint, Exception ex) {
         logger.warn("Method {} threw an exception", joinPoint.getSignature().toShortString());
         logger.warn("Exception {} with message {}", ex.getClass().getName(), ex.getMessage());
@@ -26,12 +28,19 @@ public class LoggingAspect {
     @Around("execution(* ru.alina.t1_task1.service.TaskService.addTask(..))")
     public Object logMethodElapsedTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
+        Object result;
+        try{
+             result = joinPoint.proceed();
+        } catch(Exception ex){
+            logger.warn("Method {} threw an exception while counting elasped time: {}", joinPoint.getSignature().toShortString(), ex.getMessage());
+            throw ex;
+        }
         long endTime = System.currentTimeMillis();
         long elapsedTime = endTime - startTime;
         logger.info("Method {} completed in {} ms", joinPoint.getSignature().toShortString(), elapsedTime);
         return result;
     }
+
     @AfterReturning(pointcut = "@annotation(ru.alina.t1_task1.aspect.annotation.CustomLogging)", returning = "result")
     public void logMethodReturning(JoinPoint joinPoint, Object result) {
         logger.info("Method {} returned {}", joinPoint.getSignature().toShortString(), result.toString());
