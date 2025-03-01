@@ -10,8 +10,10 @@ import ru.alina.t1_task1.dto.TaskDto;
 @Component
 @RequiredArgsConstructor
 public class TaskProducer {
+
     @Value("${kafka.topic.task-status}")
     private String clientTopic;
+
     private final KafkaTemplate<String, TaskDto> kafkaTemplate;
 
     public void send(TaskDto taskDto) {

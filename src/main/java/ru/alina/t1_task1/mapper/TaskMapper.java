@@ -6,6 +6,7 @@ import ru.alina.t1_task1.entity.Task;
 
 @Component
 public class TaskMapper {
+
     public TaskDto toTaskDto(Task task) {
         return TaskDto.builder()
                 .id(task.getId())
@@ -15,6 +16,7 @@ public class TaskMapper {
                 .userId(task.getUserId())
                 .build();
     }
+
     public Task toTaskEntity(TaskDto taskDto) {
         return Task.builder()
                 .id(taskDto.getId())

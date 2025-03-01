@@ -17,13 +17,14 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
 import ru.alina.t1_task1.dto.TaskDto;
-import ru.alina.t1_task1.kafka.utils.MessageDeserializer;
+import ru.alina.t1_task1.kafka.util.MessageDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
 @Slf4j
 @Configuration
 public class KafkaConfig {
+
     @Value("${spring.kafka.group-id}")
     private String groupId;
     @Value("${spring.kafka.bootstrap-servers}")
@@ -40,7 +41,7 @@ public class KafkaConfig {
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, TaskDto.class.getName());
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, MessageDeserializer.class.getName());
-        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName()); //todo my own class
+        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, MessageDeserializer.class.getName());
 
         DefaultKafkaConsumerFactory<String, TaskDto> factory = new DefaultKafkaConsumerFactory<>(props);
         factory.setKeyDeserializer(new StringDeserializer());
@@ -53,6 +54,7 @@ public class KafkaConfig {
         factoryBuilder(consumerFactory, factory);
         return factory;
     }
+
     private <T> void factoryBuilder(ConsumerFactory<String, T> consumerFactory, ConcurrentKafkaListenerContainerFactory<String, T> factory) {
         factory.setConsumerFactory(consumerFactory);
         factory.setBatchListener(true);

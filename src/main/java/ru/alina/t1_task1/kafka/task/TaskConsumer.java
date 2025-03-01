@@ -13,6 +13,7 @@ import ru.alina.t1_task1.service.NotificationService;
 public class TaskConsumer {
 
     private final NotificationService notificationService;
+
     @KafkaListener(topics = "${kafka.topic.task-status}",
             containerFactory = "kafkaListenerContainerFactory")
     public void consume(TaskDto taskDto) {

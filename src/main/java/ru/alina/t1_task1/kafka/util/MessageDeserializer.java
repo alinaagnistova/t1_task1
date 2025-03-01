@@ -1,4 +1,4 @@
-package ru.alina.t1_task1.kafka.utils;
+package ru.alina.t1_task1.kafka.util;
 
 
 
@@ -25,6 +25,7 @@ public class MessageDeserializer<T> extends JsonDeserializer<T> {
             return null;
         }
     }
+
     @Override
     public T deserialize(String topic, Headers headers, byte[] data) {
         try{
