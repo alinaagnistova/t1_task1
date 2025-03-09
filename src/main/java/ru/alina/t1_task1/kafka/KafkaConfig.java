@@ -7,6 +7,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.CommonErrorHandler;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -21,6 +22,7 @@ import ru.alina.t1_task1.kafka.util.MessageDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
+
 @Slf4j
 @Configuration
 public class KafkaConfig {
@@ -36,6 +38,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MessageDeserializer.class);
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, TaskDto.class.getName());
@@ -60,20 +63,21 @@ public class KafkaConfig {
         factory.setBatchListener(true);
         factory.setConcurrency(1);
         factory.getContainerProperties().setPollTimeout(5000);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factory.setCommonErrorHandler(errorHandler());
     }
 
     private CommonErrorHandler errorHandler() {
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(1000L, 3));
         errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
-        errorHandler.setRetryListeners(((record, ex, deliveryAttempt) ->{
+        errorHandler.setRetryListeners(((record, ex, deliveryAttempt) -> {
             log.error(" RetryListeners message = {}, offset = {}, deliveryAttempt = {}", ex.getMessage(), record.offset(), deliveryAttempt);
         }
-                ));
+        ));
         return errorHandler;
     }
 
-    @Bean
+    @Bean(name = "task_updating")
     public KafkaTemplate<String, TaskDto> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }

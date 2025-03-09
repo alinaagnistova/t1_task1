@@ -32,4 +32,6 @@ email:
   task-change:
     subject: ${EMAIL_TASK_CHANGE_SUBJECT}
     recipient: ${EMAIL_TASK_CHANGE_RECIPIENT}
+server:
+  port: 8456
 

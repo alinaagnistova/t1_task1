@@ -11,11 +11,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 @Slf4j
 public class MessageDeserializer<T> extends JsonDeserializer<T> {
 
-
-    private static String getMessage(byte[] data){
-        return new String(data, StandardCharsets.UTF_8);
-    }
-
     @Override
     public T deserialize(String topic, byte[] data) {
         try{

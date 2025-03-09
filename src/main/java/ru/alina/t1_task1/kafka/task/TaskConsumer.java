@@ -3,9 +3,11 @@ package ru.alina.t1_task1.kafka.task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import ru.alina.t1_task1.dto.TaskDto;
 import ru.alina.t1_task1.service.NotificationService;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -16,9 +18,18 @@ public class TaskConsumer {
 
     @KafkaListener(topics = "${kafka.topic.task-status}",
             containerFactory = "kafkaListenerContainerFactory")
-    public void consume(TaskDto taskDto) {
-        log.info("Received Task Update: ID = {}, Status = {}", taskDto.getId(), taskDto.getStatus());
-        notificationService.notify(taskDto);
+    public void consume(List<TaskDto> taskDtoList, Acknowledgment ack) {
+        log.info("Received {} Task Updates", taskDtoList.size());
+        try {
+            taskDtoList.forEach(taskDto -> {
+                log.info("Processing Task Update: ID = {}, Status = {}", taskDto.getId(), taskDto.getStatus());
+                notificationService.notify(taskDto);
+            });
+            ack.acknowledge();
+            log.info("Successfully processed and acknowledged {} messages.", taskDtoList.size());
+        } catch (Exception e) {
+            log.error("Error processing batch of messages, skipping acknowledgment. Cause: {}", e.getMessage(), e);
+        }
     }
 
 }

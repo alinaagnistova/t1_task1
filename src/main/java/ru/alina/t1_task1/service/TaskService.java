@@ -44,30 +44,26 @@ public class TaskService {
     @CustomExceptionHandling
     public TaskDto updateTaskById(Long id, TaskDto taskDto) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        boolean isUpdated = false;
-        boolean isStatusChanged = false;
+        boolean isNeedToUpdate = false;
         if (!task.getTitle().equals(taskDto.getTitle())) {
             task.setTitle(taskDto.getTitle());
-            isUpdated = true;
+            isNeedToUpdate = true;
         }
         if (!task.getDescription().equals(taskDto.getDescription())) {
             task.setDescription(taskDto.getDescription());
-            isUpdated = true;
-        }
-        if (!task.getStatus().equals(taskDto.getStatus())) {
-            task.setStatus(taskDto.getStatus());
-            isStatusChanged = true;
-            isUpdated = true;
+            isNeedToUpdate = true;
         }
         if (!task.getUserId().equals(taskDto.getUserId())) {
             task.setUserId(taskDto.getUserId());
-            isUpdated = true;
+            isNeedToUpdate = true;
         }
-        TaskDto newTaskDto = isUpdated ? taskMapper.toTaskDto(taskRepository.save(task)) : taskMapper.toTaskDto(task);
-        if (isStatusChanged){
-            taskProducer.send(newTaskDto);
+        if (!task.getStatus().equals(taskDto.getStatus())) {
+            task.setStatus(taskDto.getStatus());
+            isNeedToUpdate = true;
+            taskProducer.send(taskMapper.toTaskDto(task));
         }
-        return newTaskDto;
+
+        return  isNeedToUpdate ? taskMapper.toTaskDto(taskRepository.save(task)) : taskMapper.toTaskDto(task);
     }
 
     @CustomExceptionHandling
