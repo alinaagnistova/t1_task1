@@ -1,9 +1,6 @@
 package ru.alina.t1_task1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -19,6 +16,8 @@ public class Task {
     private Long id;
     private String title;
     private String description;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private Long userId;
 
     @Override
@@ -27,6 +26,7 @@ public class Task {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
+                ", status=" + status +
                 ", userId=" + userId +
                 '}';
     }

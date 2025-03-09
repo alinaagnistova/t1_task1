@@ -7,7 +7,31 @@ spring:
     password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    group-id: task_management
+    bootstrap-servers: localhost:9092
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+kafka:
+    topic:
+      task-status: task-status-topic
+email:
+  task-change:
+    subject: ${EMAIL_TASK_CHANGE_SUBJECT}
+    recipient: ${EMAIL_TASK_CHANGE_RECIPIENT}
+server:
+  port: 8456
+

@@ -7,6 +7,7 @@ import ru.alina.t1_task1.aspect.annotation.CustomLogging;
 import ru.alina.t1_task1.dto.TaskDto;
 import ru.alina.t1_task1.entity.Task;
 import ru.alina.t1_task1.exception.TaskNotFoundException;
+import ru.alina.t1_task1.kafka.task.TaskProducer;
 import ru.alina.t1_task1.mapper.TaskMapper;
 import ru.alina.t1_task1.repository.TaskRepository;
 
@@ -16,8 +17,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
+
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final TaskProducer taskProducer;
 
     @CustomLogging
     public TaskDto addTask(TaskDto taskDto) {
@@ -41,20 +44,26 @@ public class TaskService {
     @CustomExceptionHandling
     public TaskDto updateTaskById(Long id, TaskDto taskDto) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        boolean isUpdated = false;
+        boolean isNeedToUpdate = false;
         if (!task.getTitle().equals(taskDto.getTitle())) {
             task.setTitle(taskDto.getTitle());
-            isUpdated = true;
+            isNeedToUpdate = true;
         }
         if (!task.getDescription().equals(taskDto.getDescription())) {
             task.setDescription(taskDto.getDescription());
-            isUpdated = true;
+            isNeedToUpdate = true;
         }
         if (!task.getUserId().equals(taskDto.getUserId())) {
             task.setUserId(taskDto.getUserId());
-            isUpdated = true;
+            isNeedToUpdate = true;
         }
-        return isUpdated ? taskMapper.toTaskDto(taskRepository.save(task)) : taskMapper.toTaskDto(task);
+        if (!task.getStatus().equals(taskDto.getStatus())) {
+            task.setStatus(taskDto.getStatus());
+            isNeedToUpdate = true;
+            taskProducer.send(taskMapper.toTaskDto(task));
+        }
+
+        return  isNeedToUpdate ? taskMapper.toTaskDto(taskRepository.save(task)) : taskMapper.toTaskDto(task);
     }
 
     @CustomExceptionHandling
